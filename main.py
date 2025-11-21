@@ -4,19 +4,14 @@ from services.trello_service import TrelloService
 
 app = FastAPI()
 
-# ------------ ROOT ------------
 @app.get("/")
 def root():
-    return {"status": "ok", "service": "Trello Sync API"}
+    return {"status":"ok"}
 
-
-# ------------ EXISTENTE: ODOO → TRELLO ------------
 @app.post("/sync/odoo-to-trello")
 def sync_odoo():
     return sync_reparaciones()
 
-
-# ------------ NUEVO: CREAR TARJETA EN TRELLO ------------
 @app.post("/trello/create-card")
 def create_card(payload: dict):
     title = payload.get("title")
@@ -24,19 +19,13 @@ def create_card(payload: dict):
     list_id = payload.get("list_id")
 
     if not all([title, desc, list_id]):
-        return {"error": "title, description y list_id son obligatorios"}
+        return {"error": "Faltan campos: title, description, list_id"}
 
-    trello = TrelloService()
-    result = trello.create_card(
-        title=title,
-        description=desc,
-        list_id=list_id
-    )
-    return result
+    service = TrelloService()
+    return service.create_card(title, desc, list_id)
 
 
-# ------------ NUEVO: LISTAR LISTAS DE UN TABLERO ------------
 @app.get("/trello/lists/{board_id}")
 def get_lists(board_id: str):
-    trello = TrelloService()
-    return trello.get_board_lists(board_id)
+    service = TrelloService()
+    return service.get_lists(board_id)
